@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Prediction API Connection</h1>
+    
+    <div class="test-section">
+        <h2>API Configuration</h2>
+        <p><strong>URL:</strong> <code id="apiUrl">http://localhost:8000</code></p>
+        <button onclick="testRoot()">Test Root Endpoint (/)</button>
+        <button onclick="testGrid()">Test Grid Endpoint</button>
+        <button onclick="testAll()">Test All Endpoints</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = message;
+            resultsDiv.appendChild(p);
+            console.log(message);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testRoot() {
+            clearResults();
+            log('Testing root endpoint (/)...', 'info');
+            try {
+                const response = await axios.get(`${API_URL}/`, {
+                    timeout: 5000
+                });
+                log(`✅ SUCCESS: Root endpoint accessible`, 'success');
+                log(`Status: ${response.status}`, 'success');
+                log(`Response: ${JSON.stringify(response.data, null, 2)}`, 'success');
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`, 'error');
+                if (error.response) {
+                    log(`Status: ${error.response.status}`, 'error');
+                    log(`Data: ${JSON.stringify(error.response.data, null, 2)}`, 'error');
+                } else if (error.request) {
+                    log(`No response received. API might not be running.`, 'error');
+                    log(`Make sure API is running at ${API_URL}`, 'error');
+                }
+            }
+        }
+        
+        async function testGrid() {
+            clearResults();
+            log('Testing grid endpoint (/api/predictions/grid)...', 'info');
+            const bbox = [95, -11, 141, 6];
+            const date = new Date();
+            date.setDate(date.getDate() + 1);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            try {
+                const response = await axios.get(`${API_URL}/api/predictions/grid`, {
+                    params: {
+                        bbox: bbox.join(','),
+                        date: dateStr,
+                        grid_size: 0.5
+                    },
+                    timeout: 30000
+                });
+                log(`✅ SUCCESS: Grid endpoint accessible`, 'success');
+                log(`Status: ${response.status}`, 'success');
+                log(`Total predictions: ${response.data?.total || 0}`, 'success');
+                log(`Response sample: ${JSON.stringify(response.data, null, 2)}`, 'success');
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`, 'error');
+                if (error.response) {
+                    log(`Status: ${error.response.status}`, 'error');
+                    log(`Data: ${JSON.stringify(error.response.data, null, 2)}`, 'error');
+                } else if (error.request) {
+                    log(`No response received. Check console for details.`, 'error');
+                }
+            }
+        }
+        
+        async function testAll() {
+            clearResults();
+            log('Testing all endpoints...', 'info');
+            await testRoot();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testGrid();
+        }
+    </script>
+</body>
+</html>
+

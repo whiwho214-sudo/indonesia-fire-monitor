@@ -1,0 +1,26 @@
+{
+  "model_type": "random_forest",
+  "prediction_days": 1,
+  "accuracy": 0.9974622969837587,
+  "f1_score": 0.9956437861721327,
+  "roc_auc": 0.9999679739180707,
+  "features": [
+    "latitude",
+    "longitude",
+    "brightness",
+    "count_last_1d",
+    "count_last_3d",
+    "count_last_7d",
+    "count_last_14d",
+    "avg_brightness_last_7d",
+    "max_brightness_last_7d",
+    "month",
+    "day_of_year",
+    "week_of_year",
+    "is_dry_season",
+    "is_rainy_season",
+    "is_weekend",
+    "hotspot_trend_7d"
+  ],
+  "trained_at": "2025-11-03T11:27:57.129708"
+}

@@ -1,0 +1,269 @@
+================================================================================
+🔥 INDONESIA FIRE & AIR QUALITY MONITOR - QUICK START GUIDE 🔥
+================================================================================
+
+📍 Lokasi Proyek:
+C:\Users\Moehi\OneDrive\Documents\indonesia-fire-monitor
+
+================================================================================
+⚡ LANGKAH CEPAT (3 Steps)
+================================================================================
+
+1️⃣  INSTALL NODE.JS
+   → Download: https://nodejs.org/
+   → Install versi LTS (Long Term Support)
+   → Restart terminal/command prompt
+
+2️⃣  DAPATKAN NASA API KEY
+   → Kunjungi: https://firms.modaps.eosdis.nasa.gov/api/area/
+   → Isi form & submit
+   → Cek email untuk MAP_KEY
+
+3️⃣  RUN PROJECT
+   Buka Command Prompt atau PowerShell:
+   
+   cd C:\Users\Moehi\OneDrive\Documents\indonesia-fire-monitor
+   npm install
+   copy .env.example .env
+   
+   Kemudian edit file .env (dengan Notepad atau text editor):
+   - Ganti "your_map_key_here" dengan NASA MAP_KEY Anda
+   - Simpan file
+   
+   npm run dev
+   
+   Browser akan otomatis terbuka di http://localhost:3000
+
+================================================================================
+📁 FILE PENTING
+================================================================================
+
+📖 Dokumentasi:
+   ├─ README.md ................... Dokumentasi lengkap
+   ├─ SETUP.md .................... Panduan setup detail
+   ├─ API_GUIDE.md ................ Panduan integrasi API
+   ├─ PROJECT_SUMMARY.md .......... Ringkasan proyek
+   └─ QUICK_START.txt ............. File ini
+
+⚙️  Konfigurasi:
+   ├─ .env.example ................ Template environment variables
+   ├─ package.json ................ Dependencies & scripts
+   ├─ vite.config.js .............. Vite configuration
+   └─ tailwind.config.js .......... TailwindCSS configuration
+
+💻 Source Code:
+   └─ src/
+      ├─ App.jsx .................. Main application
+      ├─ components/ .............. React components (9 files)
+      ├─ services/ ................ API services
+      └─ utils/ ................... Utility functions
+
+================================================================================
+🎯 FITUR UTAMA
+================================================================================
+
+✅ Peta Interaktif Indonesia
+✅ Real-time Hotspot dari NASA FIRMS
+✅ Data Kualitas Udara (AQI)
+✅ Data Cuaca (Suhu, Kelembaban, Angin)
+✅ Time Slider (1-7 hari)
+✅ Filter by Confidence/Provinsi/Brightness
+✅ Auto-refresh setiap 10 menit
+✅ Responsive Mobile & Desktop
+✅ Offline Mode dengan fallback data
+
+================================================================================
+🎨 KOMPONEN YANG SUDAH DIBUAT
+================================================================================
+
+Map & Layers:
+├─ MapView.jsx ................. Container utama peta
+├─ HotspotLayer.jsx ............ Layer marker hotspot kebakaran
+├─ AQILayer.jsx ................ Layer kualitas udara
+└─ WeatherLayer.jsx ............ Layer data cuaca
+
+UI Components:
+├─ Header.jsx .................. Header dengan refresh button
+├─ SidebarFilters.jsx .......... Sidebar kiri (filter & kontrol)
+├─ SidebarAQI.jsx .............. Sidebar kanan (info AQI)
+├─ TimeSlider.jsx .............. Slider timeline 1-7 hari
+└─ Legend.jsx .................. Legend peta
+
+Services & Utils:
+├─ api.js ...................... NASA FIRMS & BMKG API
+└─ dataProcessing.js ........... Filtering & processing data
+
+================================================================================
+🔑 ENVIRONMENT VARIABLES (.env)
+================================================================================
+
+WAJIB:
+   VITE_NASA_MAP_KEY=your_map_key_here
+
+OPTIONAL:
+   VITE_REFRESH_INTERVAL=600000
+   VITE_MAPBOX_TOKEN=your_mapbox_token_here
+
+================================================================================
+🚀 COMMANDS
+================================================================================
+
+Development:
+   npm run dev ................... Run development server
+
+Production:
+   npm run build ................. Build untuk production
+   npm run preview ............... Preview production build
+
+================================================================================
+🌐 API DATA SOURCES
+================================================================================
+
+1. NASA FIRMS (Hotspot Data)
+   ├─ URL: https://firms.modaps.eosdis.nasa.gov/
+   ├─ Satelit: VIIRS SNPP Near Real-Time
+   ├─ Coverage: Seluruh Indonesia
+   ├─ Update: Setiap 3 jam
+   └─ Format: CSV → parsed to JSON
+
+2. AQI Data (Mock - Production needs real API)
+   ├─ Alternative: AQICN.org, OpenWeatherMap
+   ├─ Cities: 8 kota besar Indonesia
+   └─ Data: AQI, PM2.5, PM10, O3, CO
+
+3. Weather Data (Mock - Production needs real API)
+   ├─ Alternative: OpenWeatherMap, WeatherAPI
+   ├─ Stations: 5 stasiun cuaca utama
+   └─ Data: Suhu, kelembaban, angin, hujan
+
+================================================================================
+❓ TROUBLESHOOTING
+================================================================================
+
+Problem: npm command not found
+→ Install Node.js dari https://nodejs.org/
+
+Problem: Failed to fetch hotspots
+→ Cek NASA MAP_KEY di file .env
+→ Pastikan tidak ada spasi atau karakter tambahan
+
+Problem: Port 3000 already in use
+→ Aplikasi akan auto-switch ke port lain (3001, 3002, etc)
+→ Atau stop aplikasi lain yang pakai port 3000
+
+Problem: Map tidak muncul
+→ Clear browser cache
+→ Cek console (F12) untuk error messages
+→ Pastikan koneksi internet aktif
+
+================================================================================
+📊 TECH STACK
+================================================================================
+
+Frontend:  React 18.3.1
+Build:     Vite 5.3.1
+Styling:   TailwindCSS 3.4.3
+Map:       Leaflet.js 1.9.4 + React-Leaflet 4.2.1
+HTTP:      Axios 1.7.2
+Date:      date-fns 3.6.0
+Icons:     Lucide React 0.344.0
+
+================================================================================
+🎓 BACA DOKUMENTASI LENGKAP
+================================================================================
+
+Untuk informasi detail:
+→ README.md ............ Dokumentasi lengkap aplikasi
+→ SETUP.md ............. Panduan setup step-by-step
+→ API_GUIDE.md ......... Panduan integrasi API production
+→ PROJECT_SUMMARY.md ... Overview lengkap proyek
+
+================================================================================
+✅ CHECKLIST SEBELUM RUN
+================================================================================
+
+[  ] Node.js sudah terinstall
+[  ] npm command tersedia di terminal
+[  ] NASA FIRMS MAP_KEY sudah didapat
+[  ] File .env sudah dibuat dari .env.example
+[  ] MAP_KEY sudah diisi di .env
+[  ] npm install sudah dijalankan
+[  ] Koneksi internet aktif
+
+================================================================================
+🎉 EXPECTED RESULT
+================================================================================
+
+Jika berhasil, Anda akan melihat:
+✓ Peta Indonesia di browser
+✓ Marker hotspot berwarna merah/orange/kuning
+✓ Sidebar kiri dengan filter
+✓ Sidebar kanan dengan info AQI
+✓ Header dengan waktu update
+✓ Time slider di bawah peta
+✓ Legend di pojok kanan atas
+
+================================================================================
+📱 RESPONSIVE DESIGN
+================================================================================
+
+Desktop (>1280px):  Full layout dengan 2 sidebar
+Tablet (768-1280):  Sidebar collapsible
+Mobile (<768px):    Stack layout, bottom sheet
+
+================================================================================
+🔄 AUTO-REFRESH
+================================================================================
+
+Default: Setiap 10 menit (600000 ms)
+Configurable: Edit VITE_REFRESH_INTERVAL di .env
+Manual: Klik tombol "Refresh" di header
+
+================================================================================
+💡 TIPS
+================================================================================
+
+→ Gunakan browser modern (Chrome, Firefox, Edge)
+→ Buka DevTools (F12) untuk debug
+→ Cek Network tab untuk API calls
+→ Console tab untuk error messages
+→ Mock data otomatis muncul jika API gagal
+
+================================================================================
+🆘 EMERGENCY CONTACTS
+================================================================================
+
+Untuk kebakaran darurat:
+   Damkar: 113
+   Manggala Agni (KLHK): 021-5747322
+   BNPB: 117
+
+Aplikasi ini untuk monitoring, bukan emergency response system!
+
+================================================================================
+🏆 CREDITS
+================================================================================
+
+Created with ❤️ for Indonesia
+Data by NASA FIRMS
+Maps by Leaflet.js & OpenStreetMap
+Built with React + Vite + TailwindCSS
+
+================================================================================
+📞 SUPPORT
+================================================================================
+
+Jika ada masalah:
+1. Baca SETUP.md untuk troubleshooting
+2. Cek README.md untuk dokumentasi lengkap
+3. Review API_GUIDE.md untuk integrasi API
+4. Inspect kode di folder src/ untuk customization
+
+================================================================================
+
+🎊 SELAMAT MENGGUNAKAN INDONESIA FIRE MONITOR! 🎊
+
+Happy Coding! 🚀🔥🌏
+
+================================================================================
+

@@ -1,0 +1,72 @@
+==================================================
+CARA JALANKAN PREDICTION API
+==================================================
+
+CARA CEPAT (PILIH SALAH SATU):
+==================================================
+1. DOUBLE-CLICK: JALANKAN_API_SEKARANG.bat
+   ATAU
+2. DOUBLE-CLICK: JALANKAN_API_SEKARANG.ps1
+
+Jika tidak bisa, gunakan cara manual di bawah.
+
+
+LANGKAH 1: TRAIN MODEL (Hanya sekali, butuh waktu 10-30 menit)
+==================================================
+Buka PowerShell/terminal di folder project:
+
+    cd ml-prediction
+    .\venv\Scripts\python.exe train_models.py --full-pipeline --days 365 --model-type rf
+
+Tunggu sampai muncul:
+    ✅ Training Pipeline Completed Successfully!
+
+
+LANGKAH 2: JALANKAN API (CARA MANUAL)
+==================================================
+Buka PowerShell/terminal BARU di folder ROOT project:
+
+    cd ml-prediction
+    .\venv\Scripts\python.exe api\prediction_api.py
+
+Atau gunakan Python langsung setelah activate:
+
+    cd ml-prediction
+    .\venv\Scripts\Activate.ps1
+    python api\prediction_api.py
+
+Anda akan melihat:
+    INFO:     Uvicorn running on http://0.0.0.0:8000
+
+JANGAN TUTUP TERMINAL INI! Biarkan tetap berjalan.
+
+
+LANGKAH 3: TEST DI APLIKASI
+==================================================
+1. Buka aplikasi React di browser
+2. Refresh halaman (F5)
+3. Klik checkbox "Prediksi (1 Hari)" di sidebar kiri
+4. Prediksi akan muncul di map
+
+
+TROUBLESHOOTING
+==================================================
+❌ Error: "Model not found"
+   → Pastikan training selesai (Langkah 1)
+
+❌ Error: "No module named 'fastapi'"
+   → Jalankan: .\venv\Scripts\python.exe -m pip install -r requirements.txt
+
+❌ Port 8000 sudah digunakan
+   → Tutup aplikasi lain yang menggunakan port 8000
+   → Atau ubah port di api/prediction_api.py
+
+
+QUICK REFERENCE
+==================================================
+# Terminal 1: Training (sekali saja)
+.\venv\Scripts\python.exe train_models.py --full-pipeline --days 365 --model-type rf
+
+# Terminal 2: API (setiap kali ingin menggunakan prediksi)
+.\venv\Scripts\python.exe api\prediction_api.py
+

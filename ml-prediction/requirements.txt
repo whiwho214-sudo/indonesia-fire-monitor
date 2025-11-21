@@ -1,0 +1,40 @@
+# Core ML Libraries
+# tensorflow>=2.13.0  # Commented out - may not be available for Python 3.14
+# For Python 3.14, TensorFlow may not be available yet
+# Alternative: Use Random Forest only or install tensorflow separately if needed
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Feature Engineering
+geopandas>=0.13.0
+shapely>=2.0.0
+rasterio>=1.3.0
+
+# API
+fastapi>=0.100.0
+uvicorn>=0.23.0
+python-multipart>=0.0.6
+
+# Data Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
+requests>=2.31.0
+tqdm>=4.65.0  # Progress bar
+
+# Model Evaluation
+scipy>=1.11.0
+xgboost>=2.0.0
+
+# Jupyter
+jupyter>=1.0.0
+ipykernel>=6.25.0
+notebook>=7.0.0
+

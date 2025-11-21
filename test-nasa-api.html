@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA FIRMS API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc2626;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #dc2626;
+        }
+        .success {
+            border-left-color: #10b981;
+        }
+        .error {
+            border-left-color: #ef4444;
+        }
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #dc2626;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 NASA FIRMS API Tester</h1>
+        <p>Test API key Anda dan lihat data hotspot real-time dari NASA.</p>
+
+        <div class="input-group">
+            <label>🔑 NASA MAP_KEY:</label>
+            <input type="text" id="apiKey" placeholder="Masukkan MAP_KEY dari email NASA">
+        </div>
+
+        <div class="input-group">
+            <label>🛰️ Satellite Source:</label>
+            <select id="source">
+                <option value="VIIRS_SNPP_NRT">VIIRS S-NPP (Recommended)</option>
+                <option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20</option>
+                <option value="MODIS_NRT">MODIS (Terra & Aqua)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>📅 Day Range:</label>
+            <select id="days">
+                <option value="1">1 Hari (Hari ini)</option>
+                <option value="2">2 Hari</option>
+                <option value="7">7 Hari</option>
+                <option value="10">10 Hari</option>
+            </select>
+        </div>
+
+        <button onclick="testAPI()">🚀 Test API</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const source = document.getElementById('source').value;
+            const days = document.getElementById('days').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!apiKey) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Error</h3>
+                        <p>Silakan masukkan MAP_KEY dari NASA!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h3>⏳ Loading...</h3>
+                    <p>Mengambil data dari NASA FIRMS...</p>
+                </div>
+            `;
+
+            try {
+                // Indonesia bounding box
+                const bbox = '95,-11,141,6'; // west, south, east, north
+                const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${apiKey}/${source}/${bbox}/${days}`;
+
+                console.log('🌐 Request URL:', url.replace(apiKey, 'API_KEY_HIDDEN'));
+
+                const startTime = Date.now();
+                const response = await fetch(url);
+                const loadTime = Date.now() - startTime;
+                const data = await response.text();
+
+                console.log('📡 Response Status:', response.status);
+                console.log('📄 Response Length:', data.length);
+                console.log('📝 Raw Data:', data);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data}`);
+                }
+
+                // Parse CSV
+                const lines = data.split('\\n').filter(line => line.trim());
+                const hotspotCount = lines.length - 1; // minus header
+
+                let html = `
+                    <div class="result success">
+                        <h3>✅ API Test Successful!</h3>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number">${response.status}</div>
+                                <div class="stat-label">HTTP Status</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">${hotspotCount}</div>
+                                <div class="stat-label">Hotspots Found</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">${data.length}</div>
+                                <div class="stat-label">Response Size (bytes)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">${loadTime}ms</div>
+                                <div class="stat-label">Load Time</div>
+                            </div>
+                        </div>
+
+                        <h4>📋 CSV Header:</h4>
+                        <pre>${lines[0]}</pre>
+                `;
+
+                if (hotspotCount > 0) {
+                    html += `
+                        <h4>🔥 First 5 Hotspots:</h4>
+                        <pre>${lines.slice(1, 6).join('\\n')}</pre>
+
+                        <h4>🎉 Hasil:</h4>
+                        <p><strong>API key Anda VALID dan BEKERJA!</strong></p>
+                        <p>Ditemukan <strong>${hotspotCount} hotspot</strong> di Indonesia.</p>
+                        <p>Satelit: <strong>${source}</strong>, Periode: <strong>${days} hari</strong></p>
+                    `;
+                } else {
+                    html += `
+                        <h4>⚠️ Hasil:</h4>
+                        <p><strong>API key VALID</strong> tapi tidak ada hotspot terdeteksi.</p>
+                        <p>Ini bisa berarti:</p>
+                        <ul>
+                            <li>Tidak ada kebakaran aktif di Indonesia saat ini (kabar baik!)</li>
+                            <li>Coba ganti satelit source atau tambah day range</li>
+                        </ul>
+                        
+                        <h4>📝 Full Response:</h4>
+                        <pre>${data}</pre>
+                    `;
+                }
+
+                html += '</div>';
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ API Test Failed</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        
+                        <h4>💡 Kemungkinan Penyebab:</h4>
+                        <ul>
+                            <li><strong>API Key salah</strong> - Cek kembali MAP_KEY dari email NASA</li>
+                            <li><strong>API Key belum aktif</strong> - Tunggu beberapa menit setelah registrasi</li>
+                            <li><strong>Network error</strong> - Cek koneksi internet Anda</li>
+                        </ul>
+                        
+                        <h4>📞 Solusi:</h4>
+                        <ol>
+                            <li>Pastikan MAP_KEY di-copy dengan benar (tidak ada spasi)</li>
+                            <li>Tunggu 5-10 menit jika baru request API key</li>
+                            <li>Request MAP_KEY baru di: <a href="https://firms.modaps.eosdis.nasa.gov/api/area/" target="_blank">NASA FIRMS</a></li>
+                        </ol>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+

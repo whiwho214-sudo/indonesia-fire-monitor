@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct API Test</title>
+</head>
+<body>
+    <h1>Direct API Test</h1>
+    <button onclick="testFetch()">Test with fetch()</button>
+    <button onclick="testAxios()">Test with axios</button>
+    <div id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        
+        function log(msg) {
+            const div = document.getElementById('result');
+            div.innerHTML += '<p>' + msg + '</p>';
+            console.log(msg);
+        }
+        
+        async function testFetch() {
+            log('Testing with fetch()...');
+            try {
+                const response = await fetch(`${API_URL}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                log('Response status: ' + response.status);
+                const data = await response.json();
+                log('Success: ' + JSON.stringify(data));
+            } catch (error) {
+                log('Error: ' + error.message);
+                log('Error details: ' + JSON.stringify(error));
+            }
+        }
+        
+        async function testAxios() {
+            log('Testing with axios...');
+            try {
+                const response = await axios.get(`${API_URL}/`, {
+                    timeout: 10000,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                log('Success: ' + JSON.stringify(response.data));
+            } catch (error) {
+                log('Error: ' + error.message);
+                log('Error code: ' + error.code);
+                if (error.response) {
+                    log('Response status: ' + error.response.status);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
