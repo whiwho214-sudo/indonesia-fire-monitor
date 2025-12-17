@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🔥 Indonesia Fire & Air Quality Monitor
 
 Aplikasi web interaktif real-time untuk monitoring hotspot kebakaran dan kualitas udara di Indonesia menggunakan data dari NASA FIRMS dan BMKG.
@@ -327,3 +328,7 @@ Untuk kebakaran darurat, hubungi:
 
 **Made with 🔥 for Indonesia**
 
+=======
+# indonesia-fire-monitor
+untuk lomba 
+>>>>>>> 5dc439c733d12e21c3a372cfc7a88b8c798c4166

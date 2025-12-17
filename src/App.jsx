@@ -229,7 +229,20 @@ function App() {
       }
     } catch (err) {
       console.error('❌ Error loading predictions:', err)
-      const errorMsg = err.response?.data?.detail || err.message || 'Gagal memuat prediksi. Pastikan API prediction berjalan di http://localhost:8000'
+      
+      // Detect if running in production (Vercel)
+      const isProduction = window.location.hostname !== 'localhost' && 
+                          !window.location.hostname.includes('127.0.0.1')
+      const apiUrl = import.meta.env.VITE_PREDICTION_API_URL || 'http://127.0.0.1:8000'
+      
+      let errorMsg = err.response?.data?.detail || err.message || 'Gagal memuat prediksi'
+      
+      if (isProduction && !import.meta.env.VITE_PREDICTION_API_URL) {
+        errorMsg = 'API prediction belum dikonfigurasi untuk production. Silakan set environment variable VITE_PREDICTION_API_URL di Vercel.'
+      } else if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.message?.includes('Cannot connect')) {
+        errorMsg = `Tidak dapat terhubung ke API prediction. Pastikan API berjalan di ${apiUrl}`
+      }
+      
       setPredictionError(errorMsg)
       setPredictions([])
     } finally {
@@ -309,15 +322,40 @@ function App() {
                 <div className="flex-1">
                   <div className="font-semibold mb-2">Peringatan Prediksi</div>
                   <div className="text-sm mb-3">{predictionError}</div>
-                  <div className="text-xs mb-3 opacity-90 space-y-1">
-                    <div><strong>Langkah troubleshooting:</strong></div>
-                    <div>1. Buka terminal baru/PowerShell di folder <code className="bg-yellow-600 px-2 py-0.5 rounded">ml-prediction</code></div>
-                    <div>2. Aktifkan virtual environment: <code className="bg-yellow-600 px-2 py-0.5 rounded">.\venv\Scripts\Activate.ps1</code></div>
-                    <div>3. Jalankan API: <code className="bg-yellow-600 px-2 py-0.5 rounded">python api\prediction_api.py</code></div>
-                    <div>4. Pastikan muncul: <code className="bg-yellow-600 px-2 py-0.5 rounded">INFO: Uvicorn running on http://0.0.0.0:8000</code></div>
-                    <div>5. Biarkan terminal tetap terbuka!</div>
-                    <div>6. Buka browser console (F12) dan ketik: <code className="bg-yellow-600 px-2 py-0.5 rounded">window.testPredictionAPI()</code></div>
-                  </div>
+                  {(() => {
+                    const isProduction = window.location.hostname !== 'localhost' && 
+                                        !window.location.hostname.includes('127.0.0.1')
+                    const hasApiUrl = import.meta.env.VITE_PREDICTION_API_URL
+                    
+                    if (isProduction && !hasApiUrl) {
+                      return (
+                        <div className="text-xs mb-3 opacity-90 space-y-2">
+                          <div><strong>Untuk Production (Vercel):</strong></div>
+                          <div>1. Deploy API ke Railway/Render</div>
+                          <div>2. Set environment variable di Vercel:</div>
+                          <div className="ml-4">
+                            <code className="bg-yellow-600 px-2 py-0.5 rounded">VITE_PREDICTION_API_URL</code> = URL Railway Anda
+                          </div>
+                          <div>3. Redeploy website di Vercel</div>
+                          <div className="mt-2 text-xs opacity-75">
+                            📖 Baca: <code>FIX_API_VERCEL.md</code> untuk panduan lengkap
+                          </div>
+                        </div>
+                      )
+                    }
+                    
+                    return (
+                      <div className="text-xs mb-3 opacity-90 space-y-1">
+                        <div><strong>Langkah troubleshooting (Development):</strong></div>
+                        <div>1. Buka terminal baru/PowerShell di folder <code className="bg-yellow-600 px-2 py-0.5 rounded">ml-prediction</code></div>
+                        <div>2. Aktifkan virtual environment: <code className="bg-yellow-600 px-2 py-0.5 rounded">.\venv\Scripts\Activate.ps1</code></div>
+                        <div>3. Jalankan API: <code className="bg-yellow-600 px-2 py-0.5 rounded">python api\prediction_api.py</code></div>
+                        <div>4. Pastikan muncul: <code className="bg-yellow-600 px-2 py-0.5 rounded">INFO: Uvicorn running on http://0.0.0.0:8000</code></div>
+                        <div>5. Biarkan terminal tetap terbuka!</div>
+                        <div>6. Buka browser console (F12) dan ketik: <code className="bg-yellow-600 px-2 py-0.5 rounded">window.testPredictionAPI()</code></div>
+                      </div>
+                    )
+                  })()}
                   <button
                     onClick={() => {
                       setPredictionError(null)

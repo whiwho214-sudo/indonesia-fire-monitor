@@ -4,7 +4,19 @@
 import axios from 'axios'
 
 // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+// In production, this should be set via Vercel environment variables
 const PREDICTION_API_URL = import.meta.env.VITE_PREDICTION_API_URL || 'http://127.0.0.1:8000'
+
+// Detect if running in production
+const isProduction = typeof window !== 'undefined' && 
+                     window.location.hostname !== 'localhost' && 
+                     !window.location.hostname.includes('127.0.0.1')
+
+// Check if API URL is configured for production
+if (isProduction && !import.meta.env.VITE_PREDICTION_API_URL) {
+  console.warn('⚠️ VITE_PREDICTION_API_URL not set in production. Prediction API will not work.')
+  console.warn('💡 Set environment variable in Vercel: VITE_PREDICTION_API_URL = your-api-url')
+}
 
 /**
  * Check if prediction API is available
@@ -172,12 +184,12 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
     console.log(`🌐 Calling prediction API: ${PREDICTION_API_URL}/api/predictions/grid`)
     console.log(`📋 Params: bbox=${bbox.join(',')}, date=${date}, grid_size=${gridSize}`)
     
-    const response = await axios.get(`${PREDICTION_API_URL}/api/predictions/grid`, {
-      params: {
-        bbox: bbox.join(','),
-        date,
-        grid_size: gridSize
-      },
+    axios.post(`${PREDICTION_API_URL}/api/predict`, {
+  bbox: bbox.join(','),
+  date,
+  grid_size: gridSize
+});
+
       timeout: 120000, // Increase timeout to 120 seconds (2 minutes) for grid prediction
       headers: {
         'Accept': 'application/json'
@@ -240,11 +252,21 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
       console.error('  - Error Code:', error.code)
       console.error('  - API URL:', PREDICTION_API_URL)
       console.error('  - Message:', error.message)
-      console.error('💡 Troubleshooting:')
-      console.error('  1. Pastikan API berjalan di terminal lain')
-      console.error('  2. Jalankan: cd ml-prediction && python api/prediction_api.py')
-      console.error('  3. Pastikan API mendengarkan di:', PREDICTION_API_URL)
-      throw new Error(`Tidak dapat terhubung ke API prediction. Pastikan API berjalan di ${PREDICTION_API_URL}`)
+      console.error('  - Is Production:', isProduction)
+      
+      if (isProduction && !import.meta.env.VITE_PREDICTION_API_URL) {
+        console.error('💡 Production Setup Required:')
+        console.error('  1. Deploy API to Railway/Render')
+        console.error('  2. Set VITE_PREDICTION_API_URL in Vercel environment variables')
+        console.error('  3. Redeploy website')
+        throw new Error('API prediction belum dikonfigurasi untuk production. Set VITE_PREDICTION_API_URL di Vercel.')
+      } else {
+        console.error('💡 Troubleshooting (Development):')
+        console.error('  1. Pastikan API berjalan di terminal lain')
+        console.error('  2. Jalankan: cd ml-prediction && python api/prediction_api.py')
+        console.error('  3. Pastikan API mendengarkan di:', PREDICTION_API_URL)
+        throw new Error(`Tidak dapat terhubung ke API prediction. Pastikan API berjalan di ${PREDICTION_API_URL}`)
+      }
     } else if (error.message) {
       // Re-throw if it's already our custom error message
       throw error
