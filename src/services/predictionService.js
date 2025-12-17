@@ -184,11 +184,22 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
     console.log(`🌐 Calling prediction API: ${PREDICTION_API_URL}/api/predictions/grid`)
     console.log(`📋 Params: bbox=${bbox.join(',')}, date=${date}, grid_size=${gridSize}`)
     
-    axios.post(`${PREDICTION_API_URL}/api/predict`, {
-  bbox: bbox.join(','),
-  date,
-  grid_size: gridSize
-});
+    const response = await axios.get(
+  `${PREDICTION_API_URL}/api/predict`,
+  {
+    params: {
+      bbox: bbox.join(','),
+      date,
+      grid_size: gridSize
+    },
+    headers: {
+      'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    },
+    timeout: 120000,
+    validateStatus: status => status < 500
+  }
+);
 
       timeout: 120000, // Increase timeout to 120 seconds (2 minutes) for grid prediction
       headers: {
