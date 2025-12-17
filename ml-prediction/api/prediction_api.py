@@ -25,13 +25,20 @@ from src.prediction import predict_with_random_forest, predict_with_lstm, predic
 
 app = FastAPI(title="Hotspot Prediction API", version="1.0.0")
 
-# CORS middleware
+# CORS middleware - Allow all origins for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # Allow all origins
+        "https://indonesia-fire-monitor.vercel.app",
+        "https://*.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 
