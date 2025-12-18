@@ -413,9 +413,10 @@ def predict_future_hotspots(target_date, bbox=None, model_type='both', model_dir
     count = 0
     total_points = len(lats) * len(lons)
     
-    # Limit maximum points untuk avoid timeout
-    # Increase MAX_POINTS untuk lebih banyak predictions, tapi balance dengan speed
-    MAX_POINTS = 500  # Increased from 200 untuk lebih banyak coverage
+    # Limit maximum points untuk menghindari timeout di environment gratis (Render)
+    # 500 point butuh ~200 detik => kita turunkan agar < 120 detik
+    # Sesuaikan jika nanti performa server berubah
+    MAX_POINTS = 200
     
     if total_points > MAX_POINTS:
         # Better sampling: ambil sample yang merata di seluruh area
