@@ -180,15 +180,19 @@ export const getHotspotPrediction = async (latitude, longitude, date, weather = 
  */
 export const getPredictionGrid = async (bbox, date, gridSize = 0.3) => {
   try {
+    // Gunakan grid size tetap 0.3 untuk mencegah timeout di Render,
+    // abaikan nilai gridSize yang dikirim dari pemanggil (misal 0.15)
+    const effectiveGridSize = 0.3
+
     console.log('Prediction API URL:', PREDICTION_API_URL)
     console.log('Calling:', `${PREDICTION_API_URL}/api/predictions/grid`)
-    console.log('Params:', { bbox, date, grid_size: gridSize })
+    console.log('Params:', { bbox, date, grid_size: effectiveGridSize })
 
     const response = await axios.get(`${PREDICTION_API_URL}/api/predictions/grid`, {
       params: {
         bbox: bbox.join(','),
         date,
-        grid_size: gridSize,
+        grid_size: effectiveGridSize,
       },
       headers: {
         Accept: 'application/json',
