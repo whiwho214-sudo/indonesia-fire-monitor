@@ -175,109 +175,64 @@ export const getHotspotPrediction = async (latitude, longitude, date, weather = 
  * Get prediction grid untuk area tertentu
  * @param {Array} bbox - Bounding box [west, south, east, north]
  * @param {string} date - Date string (YYYY-MM-DD)
- * @param {number} gridSize - Grid size in degrees (default: 0.1)
- * @returns {Promise<Array>} Array of predictions with coordinates
+ * @param {number} gridSize - Grid size in degrees (default: 0.15)
+ * @returns {Promise<Object>} Prediction grid response from API
  */
 export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
   try {
-    console.log(`🌐 Prediction API URL: ${PREDICTION_API_URL}`)
-    console.log(`🌐 Calling prediction API: ${PREDICTION_API_URL}/api/predictions/grid`)
-    console.log(`📋 Params: bbox=${bbox.join(',')}, date=${date}, grid_size=${gridSize}`)
+    console.log('Prediction API URL:', PREDICTION_API_URL)
+    console.log('Calling:', `${PREDICTION_API_URL}/api/predictions/grid`)
+    console.log('Params:', { bbox, date, grid_size: gridSize })
 
-    const response = await axios.get(
-      `${PREDICTION_API_URL}/api/predictions/grid`,
-      {
-        params: {
-          bbox: bbox.join(','),
-          date,
-          grid_size: gridSize
-        },
-        headers: {
-          'Accept': 'application/json',
-          // Keep header for backward compatibility with ngrok if ever used again
-          'ngrok-skip-browser-warning': 'true'
-        },
-        // Increase timeout to 120 seconds (2 minutes) for grid prediction
-        timeout: 120000
-      }
-    )
-    
-    // Check if response was successful
-    if (response.status >= 200 && response.status < 300) {
-      console.log(`✅ API Response Status: ${response.status}`)
-      console.log(`📦 API Response Data:`, response.data)
-      
-      // Return response data immediately
-      const data = response.data
-      if (!data) {
-        console.error('⚠️ Empty response data from API')
-        throw new Error('Empty response from API')
-      }
-      
-      // Log prediction count
-      if (data.predictions) {
-        console.log(`📊 Predictions count: ${data.predictions.length}`)
-        console.log(`📊 Total: ${data.total || 0}, Raw: ${data.total_raw || 'N/A'}`)
-      } else if (Array.isArray(data)) {
-        console.log(`📊 Predictions count (array): ${data.length}`)
-      }
-      
-      return data
-    } else {
-      // Server returned error status
-      const errorMsg = response.data?.detail || `API Error: ${response.status}`
-      console.error(`📛 API Error Status: ${response.status}`)
-      console.error(`📛 Error Message:`, errorMsg)
-      throw new Error(errorMsg)
+    const response = await axios.get(`${PREDICTION_API_URL}/api/predictions/grid`, {
+      params: {
+        bbox: bbox.join(','),
+        date,
+        grid_size: gridSize,
+      },
+      headers: {
+        Accept: 'application/json',
+      },
+      timeout: 120000, // 120 detik
+    })
+
+    const data = response.data
+    if (!data) {
+      throw new Error('Empty response from API')
     }
+
+    return data
   } catch (error) {
-    console.error('❌ Error getting prediction grid:', error)
-    console.error('❌ Error code:', error.code)
-    console.error('❌ Error message:', error.message)
-    console.error('❌ Full error:', error)
-    
+    console.error('Error getting prediction grid:', error)
+
     if (error.response) {
-      // Server responded with error status
-      console.error(`📛 Status: ${error.response.status}`)
-      console.error(`📛 Data:`, error.response.data)
-      const errorMsg = error.response.data?.detail || error.response.data?.error || `API Error: ${error.response.status}`
-      throw new Error(errorMsg)
-    } else if (error.code === 'ECONNABORTED') {
-      // Timeout - this is the main issue
-      console.error('⏱️  TIMEOUT ERROR!')
-      console.error(`   API tidak merespons dalam 60 detik`)
-      console.error(`   Check terminal API - mungkin API hang saat processing`)
-      console.error(`   Atau response terlalu besar sehingga transfer lambat`)
-      throw new Error(`Request timeout setelah 60 detik. Periksa terminal API apakah ada error.`)
-    } else if (error.request || error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK' || error.code === 'ERR_CONNECTION_REFUSED') {
-      // Request was made but no response received
-      console.error('📛 Connection Error Details:')
-      console.error('  - Error Code:', error.code)
-      console.error('  - API URL:', PREDICTION_API_URL)
-      console.error('  - Message:', error.message)
-      console.error('  - Is Production:', isProduction)
-      
-      if (isProduction && !import.meta.env.VITE_PREDICTION_API_URL) {
-        console.error('💡 Production Setup Required:')
-        console.error('  1. Deploy API to Railway/Render')
-        console.error('  2. Set VITE_PREDICTION_API_URL in Vercel environment variables')
-        console.error('  3. Redeploy website')
-        throw new Error('API prediction belum dikonfigurasi untuk production. Set VITE_PREDICTION_API_URL di Vercel.')
-      } else {
-        console.error('💡 Troubleshooting (Development):')
-        console.error('  1. Pastikan API berjalan di terminal lain')
-        console.error('  2. Jalankan: cd ml-prediction && python api/prediction_api.py')
-        console.error('  3. Pastikan API mendengarkan di:', PREDICTION_API_URL)
-        throw new Error(`Tidak dapat terhubung ke API prediction. Pastikan API berjalan di ${PREDICTION_API_URL}`)
-      }
-    } else if (error.message) {
-      // Re-throw if it's already our custom error message
-      throw error
-    } else {
-      // Unknown error
-      console.error('📛 Unknown error:', error)
-      throw new Error('Gagal memuat prediksi. Silakan cek konsol untuk detail lebih lanjut.')
+      const msg =
+        error.response.data?.detail ||
+        error.response.data?.error ||
+        `API Error: ${error.response.status}`
+      throw new Error(msg)
     }
+
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout setelah 120 detik. Periksa API di Render.')
+    }
+
+    if (
+      error.request ||
+      error.code === 'ECONNREFUSED' ||
+      error.code === 'ERR_NETWORK' ||
+      error.code === 'ERR_CONNECTION_REFUSED'
+    ) {
+      if (isProduction && !import.meta.env.VITE_PREDICTION_API_URL) {
+        throw new Error(
+          'API prediction belum dikonfigurasi untuk production. Set VITE_PREDICTION_API_URL di Vercel.'
+        )
+      }
+
+      throw new Error(`Tidak dapat terhubung ke API prediction di ${PREDICTION_API_URL}`)
+    }
+
+    throw new Error('Gagal memuat prediksi. Silakan cek konsol untuk detail lebih lanjut.')
   }
 }
 
