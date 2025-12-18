@@ -108,8 +108,12 @@ function SidebarFilters({ filters, onFilterChange, hotspotCount, totalCount, lay
 
             {(layers.predictions || layers.predictionsEval) && (
               <div className="ml-6 mt-1 text-xs text-gray-600 italic space-y-1">
-                {layers.predictions && <div>🔮 Mode API: Menggunakan LSTM & Random Forest (online)</div>}
-                {layers.predictionsEval && <div>🧪 Mode Evaluation: Titik statis untuk tanggal 21 Des 2025 (tanpa API)</div>}
+                {layers.predictions && (
+                  <div>🔮 Mode API: Menggunakan LSTM &amp; Random Forest (online)</div>
+                )}
+                {layers.predictionsEval && (
+                  <div>🧪 Mode Evaluation: Untuk evaluasi model Random Forest dan akurasi Model</div>
+                )}
               </div>
             )}
           </div>
