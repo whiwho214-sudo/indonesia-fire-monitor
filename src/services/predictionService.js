@@ -183,32 +183,25 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
     console.log(`🌐 Prediction API URL: ${PREDICTION_API_URL}`)
     console.log(`🌐 Calling prediction API: ${PREDICTION_API_URL}/api/predictions/grid`)
     console.log(`📋 Params: bbox=${bbox.join(',')}, date=${date}, grid_size=${gridSize}`)
-    
-    const response = await axios.get(
-  `${PREDICTION_API_URL}/api/predict`,
-  {
-    params: {
-      bbox: bbox.join(','),
-      date,
-      grid_size: gridSize
-    },
-    headers: {
-      'Accept': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
-    },
-    timeout: 120000,
-    validateStatus: status => status < 500
-  }
-);
 
-      timeout: 120000, // Increase timeout to 120 seconds (2 minutes) for grid prediction
-      headers: {
-        'Accept': 'application/json'
-      },
-      validateStatus: function (status) {
-        return status < 500; // Accept any status code below 500
+    const response = await axios.get(
+      `${PREDICTION_API_URL}/api/predictions/grid`,
+      {
+        params: {
+          bbox: bbox.join(','),
+          date,
+          grid_size: gridSize
+        },
+        headers: {
+          'Accept': 'application/json',
+          // Keep header for backward compatibility with ngrok if ever used again
+          'ngrok-skip-browser-warning': 'true'
+        },
+        timeout: 120000, // Increase timeout to 120 seconds (2 minutes) for grid prediction
+        // Accept any status code below 500 so we can handle 4xx manually
+        validateStatus: status => status < 500
       }
-    })
+    )
     
     // Check if response was successful
     if (response.status >= 200 && response.status < 300) {
