@@ -9,6 +9,7 @@ import LoadingScreen from './components/LoadingScreen'
 import { fetchHotspots, fetchAQIData, fetchWeatherData } from './services/api'
 import { filterHotspots } from './utils/dataProcessing'
 import { getPredictionGrid, testPredictionAPI } from './services/predictionService'
+import evalPredictions2025_12_21 from './data/evalPredictions2025_12_21'
 
 function App() {
   const [showLoadingScreen, setShowLoadingScreen] = useState(true)
@@ -35,7 +36,8 @@ function App() {
     hotspots: true,
     aqi: true,
     weather: false,
-    predictions: false
+    predictions: false,      // Prediksi via API (online)
+    predictionsEval: false   // Prediksi evaluasi statis (tanpa API)
   })
   
   // Prediction states
@@ -117,7 +119,32 @@ function App() {
   }
 
   const handleLayerToggle = (layer) => {
-    setLayers(prev => ({ ...prev, [layer]: !prev[layer] }))
+    setLayers(prev => {
+      // Khusus layer prediksi API
+      if (layer === 'predictions') {
+        // Saat user klik Prediksi (1 Hari) biasa, matikan mode evaluasi
+        const newValue = !prev.predictions
+        return {
+          ...prev,
+          predictions: newValue,
+          predictionsEval: newValue ? false : prev.predictionsEval,
+        }
+      }
+
+      // Khusus layer Prediksi Evaluasi (statis)
+      if (layer === 'predictionsEval') {
+        const newValue = !prev.predictionsEval
+        return {
+          ...prev,
+          predictionsEval: newValue,
+          // Pastikan layer prediksi aktif supaya titik tetap ditampilkan di peta
+          predictions: newValue ? true : prev.predictions,
+        }
+      }
+
+      // Layer lain biasa
+      return { ...prev, [layer]: !prev[layer] }
+    })
   }
 
   const handleRefresh = () => {
@@ -129,15 +156,33 @@ function App() {
     setTimeout(() => loadData(!useMockData), 100)
   }
 
-  // Load predictions when predictions layer is enabled
+  // Load predictions when prediction layers change
   useEffect(() => {
-    if (layers.predictions) {
+    if (layers.predictionsEval) {
+      // Mode evaluasi statis (tanpa API)
+      console.log('🔬 Using static evaluation predictions for 2025-12-21')
+      setLoadingPredictions(false)
+      setPredictionError(null)
+
+      const dateStr = '2025-12-21'
+      const jitterDegree = 0.02 // sedikit saja agar tidak grid sempurna
+
+      const evalPoints = evalPredictions2025_12_21.map(p => ({
+        ...p,
+        latitude: p.latitude + (Math.random() - 0.5) * jitterDegree,
+        longitude: p.longitude + (Math.random() - 0.5) * jitterDegree,
+        date: dateStr,
+        model: 'rf-eval',
+      }))
+
+      setPredictions(evalPoints)
+    } else if (layers.predictions) {
       loadPredictions()
     } else {
       setPredictions([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layers.predictions])
+  }, [layers.predictions, layers.predictionsEval])
 
   const loadPredictions = async () => {
     try {
