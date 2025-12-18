@@ -197,9 +197,8 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
           // Keep header for backward compatibility with ngrok if ever used again
           'ngrok-skip-browser-warning': 'true'
         },
-        timeout: 120000, // Increase timeout to 120 seconds (2 minutes) for grid prediction
-        // Accept any status code below 500 so we can handle 4xx manually
-        validateStatus: status => status < 500
+        // Increase timeout to 120 seconds (2 minutes) for grid prediction
+        timeout: 120000
       }
     )
     
