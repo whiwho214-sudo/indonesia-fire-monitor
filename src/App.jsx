@@ -200,15 +200,29 @@ function App() {
       // Accept response if it has predictions array or status is success
       if (response && (response.status === 'success' || response.predictions !== undefined || Array.isArray(response))) {
         if (gridPredictions && gridPredictions.length > 0) {
-          setPredictions(gridPredictions.map(p => ({
-          ...p,
-          latitude: p.latitude || p.lat,
-          longitude: p.longitude || p.lng,
-          date: dateStr,
-          probability: p.probability || 0,
-          risk_level: p.risk_level || p.risk || 'low',
-          model: p.model || 'rf'
-        })))
+          // Tambahkan sedikit jitter acak agar pola titik tidak terlihat seperti grid kotak
+          const jitterDegree = 0.05 // ~5 km–10 km tergantung lintang
+
+          const jittered = gridPredictions.map(p => {
+            const baseLat = p.latitude || p.lat
+            const baseLon = p.longitude || p.lng
+
+            // Noise acak kecil ke atas/bawah dan kiri/kanan
+            const latJitter = (Math.random() - 0.5) * jitterDegree
+            const lonJitter = (Math.random() - 0.5) * jitterDegree
+
+            return {
+              ...p,
+              latitude: baseLat + latJitter,
+              longitude: baseLon + lonJitter,
+              date: dateStr,
+              probability: p.probability || 0,
+              risk_level: p.risk_level || p.risk || 'low',
+              model: p.model || 'rf'
+            }
+          })
+
+          setPredictions(jittered)
         
           console.log(`✅ Loaded ${gridPredictions.length} predictions for ${dateStr}`)
           setPredictionError(null)
