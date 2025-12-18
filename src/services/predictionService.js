@@ -175,10 +175,10 @@ export const getHotspotPrediction = async (latitude, longitude, date, weather = 
  * Get prediction grid untuk area tertentu
  * @param {Array} bbox - Bounding box [west, south, east, north]
  * @param {string} date - Date string (YYYY-MM-DD)
- * @param {number} gridSize - Grid size in degrees (default: 0.15)
+ * @param {number} gridSize - Grid size in degrees (default: 0.3)
  * @returns {Promise<Object>} Prediction grid response from API
  */
-export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
+export const getPredictionGrid = async (bbox, date, gridSize = 0.3) => {
   try {
     console.log('Prediction API URL:', PREDICTION_API_URL)
     console.log('Calling:', `${PREDICTION_API_URL}/api/predictions/grid`)
@@ -244,7 +244,7 @@ export const getPredictionGrid = async (bbox, date, gridSize = 0.15) => {
  */
 export const getPredictionHeatmap = async (bbox, date) => {
   try {
-    const grid = await getPredictionGrid(bbox, date, 0.1)
+    const grid = await getPredictionGrid(bbox, date, 0.3)
     
     // Convert to heatmap format
     return grid.map(pred => ({

@@ -178,7 +178,8 @@ function App() {
       
       // Get predictions dengan data historis
       console.log(`🌐 Calling prediction API: date=${dateStr}, bbox=${bbox.join(',')}`)
-      const response = await getPredictionGrid(bbox, dateStr, 0.15)
+      // Gunakan default gridSize (0.3) di predictionService untuk mengurangi beban API Render
+      const response = await getPredictionGrid(bbox, dateStr)
       
       console.log('📦 API Response:', response)
       
